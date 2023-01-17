@@ -1,4 +1,4 @@
-# Note service
+# eCommerce
 
 This application is based on the video course by "The Art of Development" channel
 

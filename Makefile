@@ -14,6 +14,11 @@ applint:
 	golangci-lint run
 
 
+# Database
+dbrun:
+	docker run -d --name ecommerce-db -e POSTGRES_PASSWORD=qwerty -p 5432:5432 --rm postgres:9.4
+
+
 # Documentation
 swagger:
 	swag init -g ./app/cmd/app/main.go -o ./app/docs
