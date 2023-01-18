@@ -1,7 +1,6 @@
 package metric
 
 import (
-	"github.com/julienschmidt/httprouter"
 	"net/http"
 )
 
@@ -9,9 +8,13 @@ const URL = "/api/heartbeat"
 
 type Handler struct{}
 
-// Register registers heartbeat handler
-// TODO fix dependency on httprouter
-func (h *Handler) Register(router *httprouter.Router) {
+// A HandlerFunc is a type that implement of handling an HTTP request.
+type HandlerFunc interface {
+	HandlerFunc(method, path string, handler http.HandlerFunc)
+}
+
+// Register adds the routes for the metric handler to the passed router.
+func (h *Handler) Register(router HandlerFunc) {
 	router.HandlerFunc(http.MethodGet, URL, h.Heartbeat)
 }
 
