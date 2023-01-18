@@ -1,0 +1,7 @@
+BEGIN;
+
+DROP TABLE IF EXISTS public.currency CASCADE;
+DROP TABLE IF EXISTS public.category CASCADE;
+DROP TABLE IF EXISTS public.product CASCADE;
+
+END;
