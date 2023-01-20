@@ -18,20 +18,11 @@ type ProductStorage struct {
 	logger       *logger.Logger
 }
 
-func NewProductStorage(client PostgreSQLClient, logger *logger.Logger) ProductStorage {
+func NewProductStorage(client PostgreSQLClient) ProductStorage {
 	return ProductStorage{
 		queryBuilder: squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar),
 		client:       client,
-		logger:       logger,
 	}
-}
-
-func (s *ProductStorage) queryLogger(sql, table string, args []interface{}) *logger.Logger {
-	return s.logger.ExtraFields(map[string]interface{}{
-		"sql":   sql,
-		"table": table,
-		"args":  args,
-	})
 }
 
 func (s *ProductStorage) All(ctx context.Context) ([]model.Product, error) {
@@ -52,12 +43,11 @@ func (s *ProductStorage) All(ctx context.Context) ([]model.Product, error) {
 
 	sql, args, err := query.ToSql()
 
-	lgr := s.queryLogger(sql, tableProduct, args)
-	if err != nil {
-		err = db.ErrCreateQuery(err)
-		lgr.Error(err)
-		return nil, err
-	}
+	lgr := logger.GetLogger(ctx).WithFields(map[string]interface{}{
+		"sql":   sql,
+		"table": tableProduct,
+		"args":  args,
+	})
 
 	lgr.Trace("do query")
 	rows, err := s.client.Query(ctx, sql, args...)

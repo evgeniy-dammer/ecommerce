@@ -1,25 +1,31 @@
 package main
 
 import (
+	"context"
 	"log"
-	
+
 	"github.com/evgeniy-dammer/ecommerce/internal/app"
 	"github.com/evgeniy-dammer/ecommerce/internal/config"
 	"github.com/evgeniy-dammer/ecommerce/pkg/logger"
 )
 
 func main() {
-	log.Println("config initialization")
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	logr := logger.GetLogger(ctx)
+
+	logr.Info("config initializing")
 	cfg := config.GetConfig()
-	
+
 	log.Println("logger initialization")
-	logr := logger.GetLogger(cfg.AppConfig.LogLevel)
-	
-	a, err := app.NewApp(cfg, &logr)
+	ctx = logger.ContextWithLogger(ctx, logr)
+
+	a, err := app.NewApp(ctx, cfg)
 	if err != nil {
-		logr.Fatal(err)
+		logger.GetLogger(ctx).Fatal(err)
 	}
-	
-	logr.Println("Running Application")
-	a.Run()
+
+	logr.Info("Running Application")
+	a.Run(ctx)
 }
